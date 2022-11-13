@@ -3,7 +3,10 @@ mod inspectable_registry;
 mod plugin;
 
 use bevy::{
-    ecs::{archetype::Archetype, query::WorldQuery},
+    ecs::{
+        archetype::Archetype,
+        query::{ReadOnlyWorldQuery, WorldQuery},
+    },
     reflect::TypeRegistration,
     window::WindowId,
 };
@@ -30,7 +33,7 @@ use impls::EntityAttributes;
 use inspectable_registry::InspectCallback;
 
 /// Resource which controls the way the world inspector is shown.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Resource)]
 pub struct WorldInspectorParams {
     /// these components will be ignored
     pub ignore_components: HashSet<TypeId>,
@@ -137,7 +140,7 @@ impl<'a> WorldUIContext<'a> {
     /// Displays the world inspector UI.
     pub fn world_ui<F>(&mut self, ui: &mut egui::Ui, params: &mut WorldInspectorParams) -> bool
     where
-        F: WorldQuery,
+        F: WorldQuery + ReadOnlyWorldQuery,
     {
         let mut root_entities = self.world.query_filtered::<Entity, (Without<Parent>, F)>();
 
@@ -616,7 +619,7 @@ macro_rules! is_bundle {
 pub fn entity_name(world: &World, entity: Entity) -> String {
     match world.get_entity(entity) {
         Some(entity) => guess_entity_name_inner(entity),
-        None => format!("Entity {} (inexistent)", entity.id()),
+        None => format!("Entity {} (inexistent)", entity.index()),
     }
 }
 
@@ -625,7 +628,7 @@ fn guess_entity_name_inner(entity: EntityRef) -> String {
         return name.as_str().to_string();
     }
 
-    let id = entity.id().id();
+    let id = entity.id().index();
 
     if entity.get::<Camera3d>().is_some() {
         return format!("Camera3d ({})", id);
@@ -673,7 +676,7 @@ fn guess_entity_name_inner(entity: EntityRef) -> String {
     if is_bundle!(
         entity: Node,
         Style,
-        UiColor,
+        BackgroundColor,
         UiImage,
         Transform,
         GlobalTransform

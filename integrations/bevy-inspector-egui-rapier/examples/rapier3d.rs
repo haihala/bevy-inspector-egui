@@ -33,11 +33,12 @@ fn setup(
     };
 
     commands
-        // .spawn_bundle(floor)
-        .spawn()
-        .insert(Name::new("Floor"))
-        .insert(RigidBody::Fixed)
-        .insert(Collider::cuboid(floor_size / 2.0, 0.1, floor_size / 2.0));
+        // .spawn(floor)
+        .spawn((
+            Name::new("Floor"),
+            RigidBody::Fixed,
+            Collider::cuboid(floor_size / 2.0, 0.1, floor_size / 2.0),
+        ));
 
     let _cube = PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: cube_size })),
@@ -46,25 +47,22 @@ fn setup(
     };
 
     commands
-        // .spawn_bundle(cube)
-        .spawn()
-        .insert(Cube)
-        .insert(Name::new("Cube"))
-        .insert(Collider::cuboid(
-            cube_size / 2.0,
-            cube_size / 2.0,
-            cube_size / 2.0,
-        ))
-        .insert(RigidBody::Dynamic)
-        .insert(CollisionGroups::default())
-        .insert(SolverGroups::default())
-        .insert(Transform::from_xyz(0.0, 2.0, 0.0));
+        // .spawn(cube)
+        .spawn((
+            Cube,
+            Name::new("Cube"),
+            Collider::cuboid(cube_size / 2.0, cube_size / 2.0, cube_size / 2.0),
+            RigidBody::Dynamic,
+            CollisionGroups::default(),
+            SolverGroups::default(),
+            Transform::from_xyz(0.0, 2.0, 0.0),
+        ));
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::default(), Vec3::Y),
         ..Default::default()
     });
