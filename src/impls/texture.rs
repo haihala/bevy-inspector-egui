@@ -55,7 +55,7 @@ impl<T: Asset + Inspectable> Inspectable for Handle<T> {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct ScaledDownTextures {
     textures: HashMap<Handle<Image>, Handle<Image>>,
 }

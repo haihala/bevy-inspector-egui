@@ -9,20 +9,20 @@ use crate::{Context, Inspectable, InspectableRegistry};
 #[allow(missing_debug_implementations)]
 /// Bevy plugin for the inspector.
 /// See the [crate-level docs](index.html) for an example on how to use it.
-pub struct InspectorPlugin<T> {
+pub struct InspectorPlugin<T: Resource> {
     marker: PhantomData<T>,
     exclusive_access: bool,
     initial_value: Option<Box<dyn Fn(&mut World) -> T + Send + Sync + 'static>>,
     window_id: WindowId,
 }
 
-impl<T: Default + Send + Sync + 'static> Default for InspectorPlugin<T> {
+impl<T: Default + Resource + Send + Sync + 'static> Default for InspectorPlugin<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: FromWorld + Send + Sync + 'static> InspectorPlugin<T> {
+impl<T: FromWorld + Resource + Send + Sync + 'static> InspectorPlugin<T> {
     /// Creates a new inspector plugin with access to `World` in the [`Context`](crate::Context).
     pub fn new() -> Self {
         InspectorPlugin {
@@ -34,7 +34,7 @@ impl<T: FromWorld + Send + Sync + 'static> InspectorPlugin<T> {
     }
 }
 
-impl<T> InspectorPlugin<T> {
+impl<T: Resource> InspectorPlugin<T> {
     /// Same as [`InspectorPlugin::new`], but doesn't automatically insert the `T` resource.
     pub fn new_insert_manually() -> Self {
         InspectorPlugin {
@@ -70,7 +70,7 @@ pub struct InspectorWindowData {
     /// Whether the ui is currently shown
     pub visible: bool,
 }
-#[derive(Default)]
+#[derive(Default, Resource)]
 /// Can be used to control whether inspector windows are shown
 pub struct InspectorWindows(bevy::utils::HashMap<TypeId, InspectorWindowData>);
 impl InspectorWindows {
@@ -116,7 +116,7 @@ impl InspectorWindows {
     }
 }
 
-impl<T> Plugin for InspectorPlugin<T>
+impl<T: Resource> Plugin for InspectorPlugin<T>
 where
     T: Inspectable + Send + Sync + 'static,
 {
@@ -131,9 +131,9 @@ where
 
         // init inspector ui and data resource
         if self.exclusive_access {
-            app.add_system(exclusive_access_ui::<T>.exclusive_system());
+            app.add_system(exclusive_access_ui::<T>);
         } else {
-            app.add_system(shared_access_ui::<T>.exclusive_system());
+            app.add_system(shared_access_ui::<T>);
         }
 
         // init egui
@@ -170,7 +170,7 @@ where
     }
 }
 
-fn shared_access_ui<T>(
+fn shared_access_ui<T: Resource>(
     data: Option<ResMut<T>>,
     mut egui_context: ResMut<EguiContext>,
     inspector_windows: Res<InspectorWindows>,

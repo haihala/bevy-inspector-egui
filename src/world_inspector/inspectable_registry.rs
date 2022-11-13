@@ -38,6 +38,7 @@ macro_rules! register {
 ///     registry.register::<CustomType>();
 /// }
 /// ```
+#[derive(Resource)]
 pub struct InspectableRegistry {
     pub(crate) impls: HashMap<TypeId, InspectCallback>,
 }

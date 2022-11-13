@@ -15,13 +15,13 @@ rapier2d = ["bevy_rapier2d"]
 rapier3d = ["bevy_rapier3d"]
 
 [dependencies]
-bevy = {version = "0.8", default-features = false}
-bevy-inspector-egui = {version = "0.13", path = "../..", features = ["nalgebra031"]}
+bevy = {version = "0.9", default-features = false}
+bevy-inspector-egui = {version = "0.14", path = "../..", features = ["nalgebra031"]}
 bevy_rapier2d = {version = "0.18", optional = true}
 bevy_rapier3d = {version = "0.18", optional = true}
 
 [dev-dependencies]
-bevy = {version = "0.8", default-features = false, features = ["x11", "bevy_winit"]}
+bevy = {version = "0.9", default-features = false, features = ["x11", "bevy_winit"]}
 
 [[example]]
 name = "rapier2d"
